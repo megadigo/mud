@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/node": "^22.8.0"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}
