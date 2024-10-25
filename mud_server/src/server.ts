@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import Game from './game';
+import Room from './room';
 
 const app = express();
 const server = http.createServer(app);
@@ -23,6 +24,10 @@ app.get('/', (req: Request, res: Response) => {
 io.on('connection', async (socket) => {
   console.log(`Player ${socket.id} connected`);
   game.addPlayer(socket.id, `Player ${socket.id}`);
+
+  const numRooms = 10;
+  const rooms = Room.createRooms(numRooms);
+  Room.connectRooms(rooms);
 
   socket.on('message', (msg) => {
     const [command, ...args] = msg.split(' ');

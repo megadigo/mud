@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const game_1 = __importDefault(require("./game"));
+const room_1 = __importDefault(require("./room"));
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server);
@@ -34,6 +35,9 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Player ${socket.id} connected`);
     game.addPlayer(socket.id, `Player ${socket.id}`);
+    const numRooms = 10;
+    const rooms = room_1.default.createRooms(numRooms);
+    room_1.default.connectRooms(rooms);
     socket.on('message', (msg) => {
         const [command, ...args] = msg.split(' ');
         if (command === 'setName') {
