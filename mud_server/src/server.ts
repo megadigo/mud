@@ -30,20 +30,33 @@ io.on('connection', async (socket) => {
   Room.connectRooms(rooms);
 
   socket.on('message', (msg) => {
+    let forceLook = false;
     const [command, ...args] = msg.split(' ');
     if (command === 'setName') {
         const name = args.join(' ');
         socket.emit('update', `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`);
-    } else if (command === 'move') {
-        const direction = args[0];
-        game.movePlayer(socket.id, direction);
-        socket.emit('update', `${bluecolor}You move to ${direction}${defaultcolor}`);
-      } else if (command === 'disconnect') {
-        game.removePlayer(socket.id);
-        console.log('user disconnected');
-      } else {
-        socket.emit('update', `${redcolor}Unknown command${defaultcolor}`);
-      }
+    } else if (command === 'move'|| command === 'look') {
+        let roomDescription = "";
+        if(command === 'move') {
+          const direction = args[0];
+          game.movePlayer(rooms,socket.id, direction);
+          roomDescription = `${greencolor}You move to ${direction}${defaultcolor}\n`;
+          forceLook = true;
+        }
+        const player = game.players.get(socket.id);
+        if (player) {
+          const room = rooms[player.location];
+          let exits : string = "";
+          room.exits.forEach((value, key) => {exits += key + " "});
+          roomDescription += `${bluecolor}[${room.id}] ${room.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
+        }
+        socket.emit('update', roomDescription);
+    } else if (command === 'disconnect') {
+      game.removePlayer(socket.id);
+      console.log('user disconnected');
+    } else {
+      socket.emit('update', `${redcolor}Unknown command${defaultcolor}`);
+    }
   });
 });
 

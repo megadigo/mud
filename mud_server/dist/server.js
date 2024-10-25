@@ -39,15 +39,28 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     const rooms = room_1.default.createRooms(numRooms);
     room_1.default.connectRooms(rooms);
     socket.on('message', (msg) => {
+        let forceLook = false;
         const [command, ...args] = msg.split(' ');
         if (command === 'setName') {
             const name = args.join(' ');
             socket.emit('update', `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`);
         }
-        else if (command === 'move') {
-            const direction = args[0];
-            game.movePlayer(socket.id, direction);
-            socket.emit('update', `${bluecolor}You move to ${direction}${defaultcolor}`);
+        else if (command === 'move' || command === 'look') {
+            let roomDescription = "";
+            if (command === 'move') {
+                const direction = args[0];
+                game.movePlayer(rooms, socket.id, direction);
+                roomDescription = `${greencolor}You move to ${direction}${defaultcolor}\n`;
+                forceLook = true;
+            }
+            const player = game.players.get(socket.id);
+            if (player) {
+                const room = rooms[player.location];
+                let exits = "";
+                room.exits.forEach((value, key) => { exits += key + " "; });
+                roomDescription += `${bluecolor}[${room.id}] ${room.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
+            }
+            socket.emit('update', roomDescription);
         }
         else if (command === 'disconnect') {
             game.removePlayer(socket.id);

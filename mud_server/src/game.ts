@@ -1,8 +1,9 @@
-// src/game.ts
+import Room from './room';
+
 interface Player {
   id: string;
   name: string;
-  location: string;
+  location: number;
 }
   
 class Game {
@@ -13,7 +14,7 @@ class Game {
   }
 
   addPlayer(id: string, name: string) {
-    const player: Player = { id, name, location: 'start' };
+    const player: Player = { id, name, location: 0 };
     this.players.set(id, player);
   }
 
@@ -21,9 +22,10 @@ class Game {
     this.players.delete(id);
   }
 
-  movePlayer(id: string, location: string) {
+  movePlayer(room: Room[], id: string, direction: string) {
     const player = this.players.get(id);
     if (player) {
+      const location: number = room[player?.location].exits.get(direction)?.id ?? player.location;
       player.location = location;
     }
   }
