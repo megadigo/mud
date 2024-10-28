@@ -1,11 +1,6 @@
 import Room from './room';
+import Player from './player';
 
-interface Player {
-  id: string;
-  name: string;
-  location: number;
-}
-  
 class Game {
   players: Map<string, Player>;
 

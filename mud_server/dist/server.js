@@ -56,9 +56,7 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
             const player = game.players.get(socket.id);
             if (player) {
                 const room = rooms[player.location];
-                let exits = "";
-                room.exits.forEach((value, key) => { exits += key + " "; });
-                roomDescription += `${bluecolor}[${room.id}] ${room.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
+                roomDescription += room.fulldescritption;
             }
             socket.emit('update', roomDescription);
         }

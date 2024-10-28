@@ -8,6 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const game = new Game();
+
 const defaultcolor = "\x1b[0m";
 const redcolor = "\x1b[31m";
 const greencolor = "\x1b[32m";
@@ -46,9 +47,7 @@ io.on('connection', async (socket) => {
         const player = game.players.get(socket.id);
         if (player) {
           const room = rooms[player.location];
-          let exits : string = "";
-          room.exits.forEach((value, key) => {exits += key + " "});
-          roomDescription += `${bluecolor}[${room.id}] ${room.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
+          roomDescription += room.fulldescritption;
         }
         socket.emit('update', roomDescription);
     } else if (command === 'disconnect') {
