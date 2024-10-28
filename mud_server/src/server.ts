@@ -34,9 +34,12 @@ io.on('connection', async (socket) => {
     let forceLook = false;
     const [command, ...args] = msg.split(' ');
     if (command === 'setName') {
+      // Set player name
         const name = args.join(' ');
         socket.emit('update', `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`);
+        
     } else if (command === 'move'|| command === 'look') {
+      // Move player / Look around
         let roomDescription = "";
         if(command === 'move') {
           const direction = args[0];
@@ -50,11 +53,15 @@ io.on('connection', async (socket) => {
           roomDescription += room.fulldescritption;
         }
         socket.emit('update', roomDescription);
+
     } else if (command === 'disconnect') {
+      // Disconect player
       game.removePlayer(socket.id);
       console.log('user disconnected');
+    
     } else {
       socket.emit('update', `${redcolor}Unknown command${defaultcolor}`);
+    
     }
   });
 });

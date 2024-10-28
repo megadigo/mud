@@ -8,6 +8,7 @@ const cyancolor = "\x1b[36m";
 const whitecolor = "\x1b[37m";
 
 class Room {
+
     id: number;
     description: string;
     exits: Map<string, Room>;
@@ -19,7 +20,6 @@ class Room {
         const fulldescritption = this.description + '\n' + `${bluecolor}[${this.id}] ${this.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
         return fulldescritption
     };
-
 
     constructor(id: number, description: string) {
         this.id = id;
@@ -66,9 +66,8 @@ class Room {
                     const randomRoom = rooms[room2connect];
                     if(!room.exits.has(direction)) {
                         room.exits.set(direction, randomRoom);
+                        rooms[room2connect].exits.set(this.oppositeDirection(direction), room);
                     }
-                    rooms[room2connect].exits.set(this.oppositeDirection(direction), room);
-
                 }
             });
         });
