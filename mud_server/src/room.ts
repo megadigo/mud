@@ -1,11 +1,4 @@
-const defaultcolor = "\x1b[0m";
-const redcolor = "\x1b[31m";
-const greencolor = "\x1b[32m";
-const bluecolor = "\x1b[34m";
-const yellowcolor = "\x1b[33m";
-const magentacolor = "\x1b[35m";
-const cyancolor = "\x1b[36m";
-const whitecolor = "\x1b[37m";
+import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor } from './constants'; // Import the constants
 
 class Room {
 
@@ -14,19 +7,19 @@ class Room {
     exits: Map<string, Room>;
     items: string[];
 
-    get fulldescritption(): string {
-        let exits = "";
-        this.exits.forEach((value, key) => {exits += key + " "});
-        const fulldescritption = this.description + '\n' + `${bluecolor}[${this.id}] ${this.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
-        return fulldescritption
-    };
-
     constructor(id: number, description: string) {
         this.id = id;
         this.description = description;
         this.exits = new Map();
         this.items = [];
     }
+
+    get fulldescritption(): string {
+        let exits = "";
+        this.exits.forEach((value, key) => {exits += key + " "});
+        const fulldescritption = this.description + '\n' + `${bluecolor}[${this.id}] ${this.description}\n${bluecolor}Exits: ${exits}${defaultcolor}`;
+        return fulldescritption
+    };
 
     static generateRandomDescription(): string {
         const descriptions = [
@@ -37,14 +30,6 @@ class Room {
         return descriptions[Math.floor(Math.random() * descriptions.length)];
     }
     
-    static createRooms(numRooms: number): Room[] {
-        const rooms: Room[] = [];
-        for (let i = 0; i < numRooms; i++) {
-            const room = new Room(i, this.generateRandomDescription());
-            rooms.push(room);
-        }
-        return rooms;
-    }
     static oppositeDirection(direction: string): string {
         const oppositeDirections: { [key: string]: string } = {
             "north": "south",
@@ -54,25 +39,65 @@ class Room {
         };
         return oppositeDirections[direction];
     }
-    static connectRooms(rooms: Room[]): void {
+
+    static createRoomsDFS(numRows: number, numCols: number): Room[][] {
+        const rooms: Room[][] = [];
+        let id = 0;
+
+        // Initialize rooms
+        for (let i = 0; i < numRows; i++) {
+            const row: Room[] = [];
+            for (let j = 0; j < numCols; j++) {
+                row.push(new Room(id++, this.generateRandomDescription()));
+            }
+            rooms.push(row);
+        }
+
+        // DFS to create paths
+        const stack: [number, number][] = [];
+        const visited: boolean[][] = Array.from({ length: numRows }, () => Array(numCols).fill(false));
         const directions = ["north", "south", "east", "west"];
-        rooms.forEach(room => {
-            directions.forEach(direction => {
-                if (Math.random() > 0.5) {
-                    let room2connect : number ;
-                    do {
-                        room2connect = Math.floor(Math.random() * rooms.length);
-                    } while (room2connect === room.id);
-                    const randomRoom = rooms[room2connect];
-                    if(!room.exits.has(direction)) {
-                        room.exits.set(direction, randomRoom);
-                        rooms[room2connect].exits.set(this.oppositeDirection(direction), room);
+        const dirOffsets: { [key: string]: [number, number] } = {
+            "north": [-1, 0],
+            "south": [1, 0],
+            "east": [0, 1],
+            "west": [0, -1]
+        };
+
+        function isValid(x: number, y: number): boolean {
+            return x >= 0 && y >= 0 && x < numRows && y < numCols;
+        }
+
+        function dfs(x: number, y: number) {
+            visited[x][y] = true;
+            stack.push([x, y]);
+
+            while (stack.length > 0) {
+                const [cx, cy] = stack.pop()!;
+                const shuffledDirections = directions.sort(() => Math.random() - 0.5);
+
+                for (const direction of shuffledDirections) {
+                    const [dx, dy] = dirOffsets[direction];
+                    const nx = cx + dx;
+                    const ny = cy + dy;
+
+                    if (isValid(nx, ny) && !visited[nx][ny]) {
+                        rooms[cx][cy].exits.set(direction, rooms[nx][ny]);
+                        rooms[nx][ny].exits.set(Room.oppositeDirection(direction), rooms[cx][cy]);
+                        visited[nx][ny] = true;
+                        stack.push([nx, ny]);
                     }
                 }
-            });
-        });
-    }
+            }
+        }
 
+        // Start DFS from a random room
+        const startX = Math.floor(Math.random() * numRows);
+        const startY = Math.floor(Math.random() * numCols);
+        dfs(startX, startY);
+
+        return rooms;
+    }
     
 }
 

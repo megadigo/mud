@@ -3,20 +3,12 @@ import http from 'http';
 import { Server } from 'socket.io';
 import Game from './game';
 import Room from './room';
+import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor } from './constants'; // Import the constants
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const game = new Game();
-
-const defaultcolor = "\x1b[0m";
-const redcolor = "\x1b[31m";
-const greencolor = "\x1b[32m";
-const bluecolor = "\x1b[34m";
-const yellowcolor = "\x1b[33m";
-const magentacolor = "\x1b[35m";
-const cyancolor = "\x1b[36m";
-const whitecolor = "\x1b[37m";
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the MUD!');
@@ -25,18 +17,16 @@ app.get('/', (req: Request, res: Response) => {
 io.on('connection', async (socket) => {
   console.log(`Player ${socket.id} connected`);
   game.addPlayer(socket.id, `Player ${socket.id}`);
-
-  const numRooms = 10;
-  const rooms = Room.createRooms(numRooms);
-  Room.connectRooms(rooms);
+  game.createRooms();
+  
+  let respond: string = ""; 
 
   socket.on('message', (msg) => {
     let forceLook = false;
     const [command, ...args] = msg.split(' ');
     if (command === 'setName') {
       // Set player name
-        const name = args.join(' ');
-        socket.emit('update', `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`);
+      let respond = game.players.get(socket.id)?.SetPlayerName(args[0]);
         
     } else if (command === 'move'|| command === 'look') {
       // Move player / Look around
@@ -52,17 +42,19 @@ io.on('connection', async (socket) => {
           const room = rooms[player.location];
           roomDescription += room.fulldescritption;
         }
-        socket.emit('update', roomDescription);
+        respond = roomDescription;
 
     } else if (command === 'disconnect') {
       // Disconect player
+      var player = game.players.get(socket.id);
       game.removePlayer(socket.id);
-      console.log('user disconnected');
-    
+      respond = `User ${player?.name} disconnected`
+      console.log(respond);
+      
     } else {
-      socket.emit('update', `${redcolor}Unknown command${defaultcolor}`);
-    
+      respond = 'update', `${redcolor}Unknown command${defaultcolor}`;
     }
+    socket.emit('update', respond);
   });
 });
 
