@@ -101,5 +101,24 @@ class Game {
     initializeGame() {
         this.rooms = this.createRoomsDFS(10, 10);
     }
+    displayRoomsGraphically(playerid, numRows, numCols) {
+        const grid = Array.from({ length: numRows * 2 - 1 }, () => Array(numCols * 2 - 1).fill(' '));
+        let player = this.players.get(playerid);
+        this.rooms.forEach(room => {
+            const x = Math.floor(room.id / numCols) * 2;
+            const y = (room.id % numCols) * 2;
+            grid[x][y] = (player === null || player === void 0 ? void 0 : player.location) === room.id ? '■' : '□'; // Use filled square for rooms
+            room.exits.forEach((connectedRoom, direction) => {
+                const [dx, dy] = direction === 'north' ? [-1, 0] :
+                    direction === 'south' ? [1, 0] :
+                        direction === 'east' ? [0, 1] :
+                            direction === 'west' ? [0, -1] : [0, 0];
+                if (dx !== 0 || dy !== 0) {
+                    grid[x + dx][y + dy] = direction === 'north' || direction === 'south' ? '|' : '-';
+                }
+            });
+        });
+        return (grid.map(row => row.join('')).join('\n'));
+    }
 }
 exports.default = Game;

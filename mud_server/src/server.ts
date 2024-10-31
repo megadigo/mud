@@ -46,6 +46,9 @@ io.on('connection', async (socket) => {
         }
         socket.emit('update', roomDescription);
 
+    } else if (command === 'map') {
+      socket.emit('update', game.displayRoomsGraphically(socket.id, 10, 10));
+      
     } else if (command === 'disconnect') {
         // Disconnect player
         game.removePlayer(socket.id);
@@ -53,10 +56,8 @@ io.on('connection', async (socket) => {
     
     } else {
         socket.emit('update', `${redcolor}Unknown command${defaultcolor}`);
-    
     }
   });
-
 
 });
 
@@ -70,5 +71,6 @@ server.listen(3000, () => {
     room.exits.forEach((value, key) => { exits += key + ">" + value.id.toString().padStart(2, '0') + " "; });
     console.log(`Room ${room.id.toString().padStart(2, '0')}: ${exits}`);
   });
+  console.log(game.displayRoomsGraphically('', 10, 10)); // Adjust numRows and numCols as needed
 
 });
