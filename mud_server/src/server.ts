@@ -18,8 +18,8 @@ io.on('connection', async (socket) => {
   console.log(`Player ${socket.id} connected`);
   game.addPlayer(socket.id, `Player ${socket.id}`);
   
-  let respond: string = ""; 
-  let setrespond: string = "";
+  let update: string = ""; 
+  let setmud: string = "";
 
   socket.on('message', (msg) => {
     let forceLook = false;
@@ -27,27 +27,24 @@ io.on('connection', async (socket) => {
     if (command === 'setName') {
         // Set player name
         const name = args.join(' ');
-        respond = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
+        update = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
         
     } else if (command === 'move' || command === 'look') {
         // Move player / Look around
-        let roomDescription = "";
         if (command === 'move') {
             const direction = args[0];
-            game.movePlayer(socket.id, direction);
-            roomDescription = `${greencolor}You move to ${direction}${defaultcolor}\n`;
+            update = game.movePlayer(socket.id, direction);
+             
         }
         const player = game.players.get(socket.id);
         if (player) {
             const room = game.rooms.get(player.location);
             if (room) {
-                roomDescription += room.fulldescritption;
+              update += room.fulldescritption;
             }
         }
-        respond = roomDescription;
-
     } else if (command === 'map') {
-      respond = game.displayRoomsGraphically(socket.id, 10, 10);
+      update = game.displayRoomsGraphically(socket.id, 10, 10);
 
     } else if (command === 'disconnect') {
         // Disconnect player
@@ -55,14 +52,14 @@ io.on('connection', async (socket) => {
         console.log('user disconnected');
     
     } else {
-        respond = `${redcolor}Unknown command${defaultcolor}`;
+      update = `${redcolor}Unknown command${defaultcolor}`;
     }
 
-    if(respond !== ""){
-      socket.emit('update', respond);
+    if(update !== ""){
+      socket.emit('update', update);
     }
-    if(setrespond !== ""){
-      socket.emit('set', setrespond);
+    if(setmud !== ""){
+      socket.emit('setmud', setmud);
     }
     
   });

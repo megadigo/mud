@@ -27,35 +27,32 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Player ${socket.id} connected`);
     game.addPlayer(socket.id, `Player ${socket.id}`);
-    let respond = "";
-    let setrespond = "";
+    let update = "";
+    let setmud = "";
     socket.on('message', (msg) => {
         let forceLook = false;
         const [command, ...args] = msg.split(' ');
         if (command === 'setName') {
             // Set player name
             const name = args.join(' ');
-            respond = `${constants_1.bluecolor}Welcome, ${name}! You are at the start.${constants_1.defaultcolor}`;
+            update = `${constants_1.bluecolor}Welcome, ${name}! You are at the start.${constants_1.defaultcolor}`;
         }
         else if (command === 'move' || command === 'look') {
             // Move player / Look around
-            let roomDescription = "";
             if (command === 'move') {
                 const direction = args[0];
-                game.movePlayer(socket.id, direction);
-                roomDescription = `${constants_1.greencolor}You move to ${direction}${constants_1.defaultcolor}\n`;
+                update = game.movePlayer(socket.id, direction);
             }
             const player = game.players.get(socket.id);
             if (player) {
                 const room = game.rooms.get(player.location);
                 if (room) {
-                    roomDescription += room.fulldescritption;
+                    update += room.fulldescritption;
                 }
             }
-            respond = roomDescription;
         }
         else if (command === 'map') {
-            respond = game.displayRoomsGraphically(socket.id, 10, 10);
+            update = game.displayRoomsGraphically(socket.id, 10, 10);
         }
         else if (command === 'disconnect') {
             // Disconnect player
@@ -63,13 +60,13 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
             console.log('user disconnected');
         }
         else {
-            respond = `${constants_1.redcolor}Unknown command${constants_1.defaultcolor}`;
+            update = `${constants_1.redcolor}Unknown command${constants_1.defaultcolor}`;
         }
-        if (respond !== "") {
-            socket.emit('update', respond);
+        if (update !== "") {
+            socket.emit('update', update);
         }
-        if (setrespond !== "") {
-            socket.emit('set', setrespond);
+        if (setmud !== "") {
+            socket.emit('setmud', setmud);
         }
     });
 }));

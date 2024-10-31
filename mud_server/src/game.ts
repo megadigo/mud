@@ -21,15 +21,20 @@ class Game {
     this.players.delete(id);
   }
 
-  movePlayer(id: string, direction: string) {
+  movePlayer(id: string, direction: string): string {
+    let response = "";
     const player = this.players.get(id);
     if (player) {
-        const currentRoom = this.rooms.get(player.location) ;
-        const nextRoom = currentRoom?.exits.get(direction);
-        if (nextRoom) {
-            player.location = nextRoom.id;
-        }
+      const currentRoom = this.rooms.get(player.location) ;
+      const nextRoom = currentRoom?.exits.get(direction);
+      if (nextRoom) {
+          player.location = nextRoom.id;
+          response = `${greencolor}You move to ${direction}${defaultcolor}\n`;
+      } else {
+        response = `${redcolor}Wrong direction${defaultcolor}\n`;
+      }
     }
+    return response;
   }
 
   //Rooms

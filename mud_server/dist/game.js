@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const room_1 = __importDefault(require("./room"));
 const player_1 = __importDefault(require("./player"));
+const constants_1 = require("./constants"); // Import the constants
 class Game {
     constructor() {
         this.players = new Map;
@@ -20,14 +21,20 @@ class Game {
         this.players.delete(id);
     }
     movePlayer(id, direction) {
+        let response = "";
         const player = this.players.get(id);
         if (player) {
             const currentRoom = this.rooms.get(player.location);
             const nextRoom = currentRoom === null || currentRoom === void 0 ? void 0 : currentRoom.exits.get(direction);
             if (nextRoom) {
                 player.location = nextRoom.id;
+                response = `${constants_1.greencolor}You move to ${direction}${constants_1.defaultcolor}\n`;
+            }
+            else {
+                response = `${constants_1.redcolor}Wrong direction${constants_1.defaultcolor}\n`;
             }
         }
+        return response;
     }
     //Rooms
     generateRandomDescription() {
