@@ -27,6 +27,7 @@ io.on('connection', async (socket) => {
     if (command === 'setName') {
         // Set player name
         const name = args.join(' ');
+        setmud = "setName " + name;
         update = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
         
     } else if (command === 'move' || command === 'look') {
@@ -55,12 +56,15 @@ io.on('connection', async (socket) => {
       update = `${redcolor}Unknown command${defaultcolor}`;
     }
 
-    if(update !== ""){
-      socket.emit('update', update);
-    }
     if(setmud !== ""){
       socket.emit('setmud', setmud);
     }
+    if(update !== ""){
+      socket.emit('update', update);
+    }
+
+    setmud = "";
+    update = "";
     
   });
 

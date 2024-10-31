@@ -2,13 +2,17 @@
 import { io } from 'socket.io-client';
 import * as readline from 'readline';
 
+
 const socket = io('http://localhost:3000'); // Ensure this URL is correct
 
-const rl = readline.createInterface({
+let playerName = '';
+
+let rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   prompt: '> '
 });
+
 
 rl.on('line', (line) => {
   const command = line.trim();
@@ -44,6 +48,14 @@ socket.on('connect_error', (error: Error) => {
 socket.on('update', (data: any) => {
   console.log(data);
   rl.prompt();
+});
+
+socket.on('setmud', (data: any) => {
+  const [command, ...args] = data.split(' ');
+  if(command === 'setName'){
+    playerName = args[0]
+    rl.setPrompt(`[${playerName}]> `)
+  }
 });
 
 socket.on('error', (error: string) => {

@@ -27,7 +27,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_client_1 = require("socket.io-client");
 const readline = __importStar(require("readline"));
 const socket = (0, socket_io_client_1.io)('http://localhost:3000'); // Ensure this URL is correct
-const rl = readline.createInterface({
+let playerName = '';
+let rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     prompt: '> '
@@ -61,6 +62,13 @@ socket.on('connect_error', (error) => {
 socket.on('update', (data) => {
     console.log(data);
     rl.prompt();
+});
+socket.on('setmud', (data) => {
+    const [command, ...args] = data.split(' ');
+    if (command === 'setName') {
+        playerName = args[0];
+        rl.setPrompt(`[${playerName}]> `);
+    }
 });
 socket.on('error', (error) => {
     console.error(error);

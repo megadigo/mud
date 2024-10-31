@@ -35,6 +35,7 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
         if (command === 'setName') {
             // Set player name
             const name = args.join(' ');
+            setmud = "setName " + name;
             update = `${constants_1.bluecolor}Welcome, ${name}! You are at the start.${constants_1.defaultcolor}`;
         }
         else if (command === 'move' || command === 'look') {
@@ -62,12 +63,14 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
         else {
             update = `${constants_1.redcolor}Unknown command${constants_1.defaultcolor}`;
         }
-        if (update !== "") {
-            socket.emit('update', update);
-        }
         if (setmud !== "") {
             socket.emit('setmud', setmud);
         }
+        if (update !== "") {
+            socket.emit('update', update);
+        }
+        setmud = "";
+        update = "";
     });
 }));
 server.listen(3000, () => {
