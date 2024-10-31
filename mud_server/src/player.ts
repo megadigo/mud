@@ -13,7 +13,7 @@ class Player {
 
     SetPlayerName(name: string): string {
         this.name = name;
-        return `${bluecolor}Welcome, ${this.name}! You are at the start.${defaultcolor}`;
+        return `${bluecolor}Welcome, ${this.name}! Let the adventure begins.${defaultcolor}`;
     }
     
 }
