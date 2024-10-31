@@ -114,7 +114,22 @@ class Game {
         this.rooms.forEach(room => {
             const x = Math.floor(room.id / numCols) * 2;
             const y = (room.id % numCols) * 2;
-            grid[x][y] = (player === null || player === void 0 ? void 0 : player.location) === room.id ? '■' : '□'; // Use filled square for rooms
+            grid[x][y] = `${constants_1.defaultcolor}□${constants_1.defaultcolor}`; // Use empty square for rooms
+            // Place other players on the grid
+            this.players.forEach((player, id) => {
+                if (id !== playerid) {
+                    const x = Math.floor(player.location / numCols) * 2;
+                    const y = (player.location % numCols) * 2;
+                    grid[x][y] = `${constants_1.redcolor}■${constants_1.defaultcolor}`; // Use star for other players
+                }
+            });
+            // Place the current player on the grid
+            const currentPlayer = this.players.get(playerid);
+            if (currentPlayer) {
+                const x = Math.floor(currentPlayer.location / numCols) * 2;
+                const y = (currentPlayer.location % numCols) * 2;
+                grid[x][y] = `${constants_1.greencolor}■${constants_1.defaultcolor}`; // Use filled square for the current player
+            }
             room.exits.forEach((connectedRoom, direction) => {
                 const [dx, dy] = direction === 'north' ? [-1, 0] :
                     direction === 'south' ? [1, 0] :
