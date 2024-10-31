@@ -19,6 +19,7 @@ io.on('connection', async (socket) => {
   game.addPlayer(socket.id, `Player ${socket.id}`);
   
   let respond: string = ""; 
+  let setrespond: string = "";
 
   socket.on('message', (msg) => {
     let forceLook = false;
@@ -26,7 +27,7 @@ io.on('connection', async (socket) => {
     if (command === 'setName') {
         // Set player name
         const name = args.join(' ');
-        socket.emit('update', `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`);
+        respond = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
         
     } else if (command === 'move' || command === 'look') {
         // Move player / Look around
@@ -35,7 +36,6 @@ io.on('connection', async (socket) => {
             const direction = args[0];
             game.movePlayer(socket.id, direction);
             roomDescription = `${greencolor}You move to ${direction}${defaultcolor}\n`;
-            forceLook = true;
         }
         const player = game.players.get(socket.id);
         if (player) {
@@ -44,19 +44,27 @@ io.on('connection', async (socket) => {
                 roomDescription += room.fulldescritption;
             }
         }
-        socket.emit('update', roomDescription);
+        respond = roomDescription;
 
     } else if (command === 'map') {
-      socket.emit('update', game.displayRoomsGraphically(socket.id, 10, 10));
-      
+      respond = game.displayRoomsGraphically(socket.id, 10, 10);
+
     } else if (command === 'disconnect') {
         // Disconnect player
         game.removePlayer(socket.id);
         console.log('user disconnected');
     
     } else {
-        socket.emit('update', `${redcolor}Unknown command${defaultcolor}`);
+        respond = `${redcolor}Unknown command${defaultcolor}`;
     }
+
+    if(respond !== ""){
+      socket.emit('update', respond);
+    }
+    if(setrespond !== ""){
+      socket.emit('set', setrespond);
+    }
+    
   });
 
 });

@@ -28,13 +28,14 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Player ${socket.id} connected`);
     game.addPlayer(socket.id, `Player ${socket.id}`);
     let respond = "";
+    let setrespond = "";
     socket.on('message', (msg) => {
         let forceLook = false;
         const [command, ...args] = msg.split(' ');
         if (command === 'setName') {
             // Set player name
             const name = args.join(' ');
-            socket.emit('update', `${constants_1.bluecolor}Welcome, ${name}! You are at the start.${constants_1.defaultcolor}`);
+            respond = `${constants_1.bluecolor}Welcome, ${name}! You are at the start.${constants_1.defaultcolor}`;
         }
         else if (command === 'move' || command === 'look') {
             // Move player / Look around
@@ -43,7 +44,6 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
                 const direction = args[0];
                 game.movePlayer(socket.id, direction);
                 roomDescription = `${constants_1.greencolor}You move to ${direction}${constants_1.defaultcolor}\n`;
-                forceLook = true;
             }
             const player = game.players.get(socket.id);
             if (player) {
@@ -52,10 +52,10 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
                     roomDescription += room.fulldescritption;
                 }
             }
-            socket.emit('update', roomDescription);
+            respond = roomDescription;
         }
         else if (command === 'map') {
-            socket.emit('update', game.displayRoomsGraphically(socket.id, 10, 10));
+            respond = game.displayRoomsGraphically(socket.id, 10, 10);
         }
         else if (command === 'disconnect') {
             // Disconnect player
@@ -63,7 +63,13 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
             console.log('user disconnected');
         }
         else {
-            socket.emit('update', `${constants_1.redcolor}Unknown command${constants_1.defaultcolor}`);
+            respond = `${constants_1.redcolor}Unknown command${constants_1.defaultcolor}`;
+        }
+        if (respond !== "") {
+            socket.emit('update', respond);
+        }
+        if (setrespond !== "") {
+            socket.emit('set', setrespond);
         }
     });
 }));
