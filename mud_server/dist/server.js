@@ -33,13 +33,14 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
         let forceLook = false;
         const [command, ...args] = msg.split(' ');
         if (command === 'setName') {
-            // Set player name
+            // #region Set player name
             const name = args.join(' ');
             setmud = "setName " + name;
             update = `${constants_1.bluecolor}Welcome, ${name}! You are at the start.${constants_1.defaultcolor}`;
+            // #endregion
         }
         else if (command === 'move' || command === 'look') {
-            // Move player / Look around
+            // #region Move player / Look around
             if (command === 'move') {
                 const direction = args[0];
                 update = game.movePlayer(socket.id, direction);
@@ -51,18 +52,23 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
                     update += room.fulldescritption;
                 }
             }
+            // #endregion
         }
         else if (command === 'map') {
-            update = game.displayRoomsGraphically(socket.id, constants_1.MaxMudRow, constants_1.MaxMudCol);
+            // #region Display map
+            update = game.displayRoomsGraphically(socket.id, 3);
+            // #endregion
         }
         else if (command === 'disconnect') {
-            // Disconnect player
+            // #region Disconnect player
             game.removePlayer(socket.id);
             console.log('user disconnected');
+            // #endregion
         }
         else {
             update = `${constants_1.redcolor}Unknown command${constants_1.defaultcolor}`;
         }
+        // #region Emits
         if (setmud !== "") {
             socket.emit('setmud', setmud);
         }
@@ -71,6 +77,7 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
         }
         setmud = "";
         update = "";
+        // #endregion
     });
 }));
 server.listen(3000, () => {
@@ -82,5 +89,5 @@ server.listen(3000, () => {
         room.exits.forEach((value, key) => { exits += key + ">" + value.id.toString().padStart(2, '0') + " "; });
         console.log(`Room ${room.id.toString().padStart(2, '0')}: ${exits}`);
     });
-    console.log(game.displayRoomsGraphically('', constants_1.MaxMudRow, constants_1.MaxMudCol)); // Adjust numRows and numCols as needed
+    console.log(game.displayRoomsGraphically('')); // Adjust numRows and numCols as needed
 });

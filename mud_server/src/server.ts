@@ -17,54 +17,66 @@ app.get('/', (req: Request, res: Response) => {
 io.on('connection', async (socket) => {
   console.log(`Player ${socket.id} connected`);
   game.addPlayer(socket.id, `Player ${socket.id}`);
-  
-  let update: string = ""; 
+
+  let update: string = "";
   let setmud: string = "";
 
   socket.on('message', (msg) => {
     let forceLook = false;
     const [command, ...args] = msg.split(' ');
     if (command === 'setName') {
-        // Set player name
-        const name = args.join(' ');
-        setmud = "setName " + name;
-        update = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
+
+      // #region Set player name
+      const name = args.join(' ');
+      setmud = "setName " + name;
+      update = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
+      // #endregion
+
     } else if (command === 'move' || command === 'look') {
-        // Move player / Look around
-        if (command === 'move') {
-            const direction = args[0];
-            update = game.movePlayer(socket.id, direction);
-             
+
+      // #region Move player / Look around
+      if (command === 'move') {
+        const direction = args[0];
+        update = game.movePlayer(socket.id, direction);
+
+      }
+      const player = game.players.get(socket.id);
+      if (player) {
+        const room = game.rooms.get(player.location);
+        if (room) {
+          update += room.fulldescritption;
         }
-        const player = game.players.get(socket.id);
-        if (player) {
-            const room = game.rooms.get(player.location);
-            if (room) {
-              update += room.fulldescritption;
-            }
-        }
+      }
+      // #endregion
+
     } else if (command === 'map') {
-      update = game.displayRoomsGraphically(socket.id, MaxMudRow,MaxMudCol);
+
+      // #region Display map
+      update = game.displayRoomsGraphically(socket.id, 3);
+      // #endregion
 
     } else if (command === 'disconnect') {
-        // Disconnect player
-        game.removePlayer(socket.id);
-        console.log('user disconnected');
-    
+
+      // #region Disconnect player
+      game.removePlayer(socket.id);
+      console.log('user disconnected');
+      // #endregion
+
     } else {
       update = `${redcolor}Unknown command${defaultcolor}`;
     }
 
-    if(setmud !== ""){
+    // #region Emits
+    if (setmud !== "") {
       socket.emit('setmud', setmud);
     }
-    if(update !== ""){
+    if (update !== "") {
       socket.emit('update', update);
     }
-
     setmud = "";
     update = "";
-    
+    // #endregion
+
   });
 
 });
@@ -75,10 +87,10 @@ server.listen(3000, () => {
 
   // Log rooms to console
   game.rooms.forEach(room => {
-    let exits = ""; 
+    let exits = "";
     room.exits.forEach((value, key) => { exits += key + ">" + value.id.toString().padStart(2, '0') + " "; });
     console.log(`Room ${room.id.toString().padStart(2, '0')}: ${exits}`);
   });
-  console.log(game.displayRoomsGraphically('', MaxMudRow, MaxMudCol)); // Adjust numRows and numCols as needed
+  console.log(game.displayRoomsGraphically('')); // Adjust numRows and numCols as needed
 
 });

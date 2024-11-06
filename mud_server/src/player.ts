@@ -27,8 +27,8 @@ class Player {
         this.name = name;
         return `${bluecolor}Welcome, ${this.name}! Let the adventure begins.${defaultcolor}`;
     }
-    
 }
+
 export default Player;
 
 
