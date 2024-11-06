@@ -14,6 +14,7 @@ class Game {
     this.monsters = new Map<string, Monster>;
   }
 
+
   // Players
   addPlayer(id: string, name: string) {
     const player: Player = new Player(id, name);
@@ -44,10 +45,15 @@ class Game {
 
   
   startMonsterMovement(): void {
-    this.monsters.set("1", new Monster("1", 0));
+    this.monsters.set("1", new Monster("1", Math.floor(Math.random() * MaxMudRow * MaxMudCol)));
+    this.monsters.set("2", new Monster("2", Math.floor(Math.random() * MaxMudRow * MaxMudCol)));
+    this.monsters.set("3", new Monster("3", Math.floor(Math.random() * MaxMudRow * MaxMudCol)));
+    this.monsters.set("4", new Monster("4", Math.floor(Math.random() * MaxMudRow * MaxMudCol)));
+    this.monsters.set("5", new Monster("5", Math.floor(Math.random() * MaxMudRow * MaxMudCol)));
     setInterval(() => {
         for (const id of this.monsters.keys()) {
             this.moveMonster(id);
+            this.checkMonsterKillsPlayer();
         }
         
     }, 5000); // Move the monster every 5 seconds
@@ -72,12 +78,22 @@ class Game {
             const ny = (currentRoom.id % MaxMudCol) + dy;
             const newLocation = nx * MaxMudCol + ny;
             if (currentRoom.exits.has(direction)) {
-              monster ? monster.location = newLocation : undefined;
                 break;
             }
         }
     }
   }
+
+  checkMonsterKillsPlayer(): void {
+    this.players.forEach((player) => {
+        this.monsters.forEach((monster, id) => {
+            if (player.location === monster.location) {
+                console.log(`${player.name} was killed by the monster!`);
+                this.removePlayer(player.id);
+            }
+        });
+    });
+}
   
   //Rooms
   generateRandomDescription(): string {
@@ -181,7 +197,7 @@ class Game {
             if (id !== playerid) {
                 const x = Math.floor(player.location / numCols) * 2;
                 const y = (player.location % numCols) * 2;
-                grid[x][y] = `${redcolor}■${defaultcolor}`; // Use star for other players
+                grid[x][y] = `${bluecolor}■${defaultcolor}`; // Use star for other players
             }
         });
 
@@ -197,7 +213,7 @@ class Game {
         for (const monster of this.monsters.values()) {
             const mx = Math.floor(monster.location / numCols) * 2;
             const my = (monster.location % numCols) * 2;
-            grid[mx][my] = `${redcolor}M${defaultcolor}`; // Use 'M' for the monster
+            grid[mx][my] = `${redcolor}▲${defaultcolor}`; // Use 'M' for the monster
         }
 
         room.exits.forEach((connectedRoom, direction) => {

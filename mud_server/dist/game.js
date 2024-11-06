@@ -40,10 +40,15 @@ class Game {
     }
     //Monsters
     startMonsterMovement() {
-        this.monsters.set("1", new monster_1.default("1", 0));
+        this.monsters.set("1", new monster_1.default("1", Math.floor(Math.random() * constants_1.MaxMudRow * constants_1.MaxMudCol)));
+        this.monsters.set("2", new monster_1.default("2", Math.floor(Math.random() * constants_1.MaxMudRow * constants_1.MaxMudCol)));
+        this.monsters.set("3", new monster_1.default("3", Math.floor(Math.random() * constants_1.MaxMudRow * constants_1.MaxMudCol)));
+        this.monsters.set("4", new monster_1.default("4", Math.floor(Math.random() * constants_1.MaxMudRow * constants_1.MaxMudCol)));
+        this.monsters.set("5", new monster_1.default("5", Math.floor(Math.random() * constants_1.MaxMudRow * constants_1.MaxMudCol)));
         setInterval(() => {
             for (const id of this.monsters.keys()) {
                 this.moveMonster(id);
+                this.checkMonsterKillsPlayer();
             }
         }, 5000); // Move the monster every 5 seconds
     }
@@ -65,11 +70,20 @@ class Game {
                 const ny = (currentRoom.id % constants_1.MaxMudCol) + dy;
                 const newLocation = nx * constants_1.MaxMudCol + ny;
                 if (currentRoom.exits.has(direction)) {
-                    monster ? monster.location = newLocation : undefined;
                     break;
                 }
             }
         }
+    }
+    checkMonsterKillsPlayer() {
+        this.players.forEach((player) => {
+            this.monsters.forEach((monster, id) => {
+                if (player.location === monster.location) {
+                    console.log(`${player.name} was killed by the monster!`);
+                    this.removePlayer(player.id);
+                }
+            });
+        });
     }
     //Rooms
     generateRandomDescription() {
@@ -156,7 +170,7 @@ class Game {
                 if (id !== playerid) {
                     const x = Math.floor(player.location / numCols) * 2;
                     const y = (player.location % numCols) * 2;
-                    grid[x][y] = `${constants_1.redcolor}■${constants_1.defaultcolor}`; // Use star for other players
+                    grid[x][y] = `${constants_1.bluecolor}■${constants_1.defaultcolor}`; // Use star for other players
                 }
             });
             // Place the current player on the grid
@@ -170,7 +184,7 @@ class Game {
             for (const monster of this.monsters.values()) {
                 const mx = Math.floor(monster.location / numCols) * 2;
                 const my = (monster.location % numCols) * 2;
-                grid[mx][my] = `${constants_1.redcolor}M${constants_1.defaultcolor}`; // Use 'M' for the monster
+                grid[mx][my] = `${constants_1.redcolor}▲${constants_1.defaultcolor}`; // Use 'M' for the monster
             }
             room.exits.forEach((connectedRoom, direction) => {
                 const [dx, dy] = direction === 'north' ? [-1, 0] :

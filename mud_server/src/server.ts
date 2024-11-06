@@ -29,7 +29,6 @@ io.on('connection', async (socket) => {
         const name = args.join(' ');
         setmud = "setName " + name;
         update = `${bluecolor}Welcome, ${name}! You are at the start.${defaultcolor}`;
-        
     } else if (command === 'move' || command === 'look') {
         // Move player / Look around
         if (command === 'move') {
