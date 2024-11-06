@@ -5,11 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const room_1 = __importDefault(require("./room"));
 const player_1 = __importDefault(require("./player"));
+const monster_1 = __importDefault(require("./monster"));
 const constants_1 = require("./constants"); // Import the constants
 class Game {
     constructor() {
         this.players = new Map;
         this.rooms = new Map;
+        this.monsters = new Map;
     }
     // Players
     addPlayer(id, name) {
@@ -35,6 +37,39 @@ class Game {
             }
         }
         return response;
+    }
+    //Monsters
+    startMonsterMovement() {
+        this.monsters.set("1", new monster_1.default("1", 0));
+        setInterval(() => {
+            for (const id of this.monsters.keys()) {
+                this.moveMonster(id);
+            }
+        }, 5000); // Move the monster every 5 seconds
+    }
+    moveMonster(id) {
+        const directions = ["north", "south", "east", "west"];
+        const dirOffsets = {
+            "north": [-1, 0],
+            "south": [1, 0],
+            "east": [0, 1],
+            "west": [0, -1]
+        };
+        const monster = this.monsters.get(id);
+        const currentRoom = monster ? this.rooms.get(monster.location) : undefined;
+        if (currentRoom) {
+            const shuffledDirections = directions.sort(() => Math.random() - 0.5);
+            for (const direction of shuffledDirections) {
+                const [dx, dy] = dirOffsets[direction];
+                const nx = Math.floor(currentRoom.id / constants_1.MaxMudCol) + dx;
+                const ny = (currentRoom.id % constants_1.MaxMudCol) + dy;
+                const newLocation = nx * constants_1.MaxMudCol + ny;
+                if (currentRoom.exits.has(direction)) {
+                    monster ? monster.location = newLocation : undefined;
+                    break;
+                }
+            }
+        }
     }
     //Rooms
     generateRandomDescription() {
@@ -107,6 +142,7 @@ class Game {
     // Game
     initializeGame() {
         this.rooms = this.createRoomsDFS(constants_1.MaxMudRow, constants_1.MaxMudCol);
+        this.startMonsterMovement();
     }
     displayRoomsGraphically(playerid, numRows, numCols) {
         const grid = Array.from({ length: numRows * 2 - 1 }, () => Array(numCols * 2 - 1).fill(' '));
@@ -129,6 +165,12 @@ class Game {
                 const x = Math.floor(currentPlayer.location / numCols) * 2;
                 const y = (currentPlayer.location % numCols) * 2;
                 grid[x][y] = `${constants_1.greencolor}■${constants_1.defaultcolor}`; // Use filled square for the current player
+            }
+            // Place the monster on the grid
+            for (const monster of this.monsters.values()) {
+                const mx = Math.floor(monster.location / numCols) * 2;
+                const my = (monster.location % numCols) * 2;
+                grid[mx][my] = `${constants_1.redcolor}M${constants_1.defaultcolor}`; // Use 'M' for the monster
             }
             room.exits.forEach((connectedRoom, direction) => {
                 const [dx, dy] = direction === 'north' ? [-1, 0] :

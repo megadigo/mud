@@ -1,14 +1,17 @@
 import Room from './room';
 import Player from './player';
+import Monster from './monster';
 import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor, MaxMudRow, MaxMudCol } from './constants'; // Import the constants
 
 class Game {
 
   players: Map<string, Player>;
   rooms : Map<number, Room>; 
+  monsters : Map<string, Monster>;
   constructor() {
     this.players = new  Map<string, Player>;
     this.rooms = new Map<number, Room>;
+    this.monsters = new Map<string, Monster>;
   }
 
   // Players
@@ -37,6 +40,45 @@ class Game {
     return response;
   }
 
+  //Monsters
+
+  
+  startMonsterMovement(): void {
+    this.monsters.set("1", new Monster("1", 0));
+    setInterval(() => {
+        for (const id of this.monsters.keys()) {
+            this.moveMonster(id);
+        }
+        
+    }, 5000); // Move the monster every 5 seconds
+}
+
+
+  moveMonster(id: string): void {
+    const directions = ["north", "south", "east", "west"];
+    const dirOffsets: { [key: string]: [number, number] } = {
+        "north": [-1, 0],
+        "south": [1, 0],
+        "east": [0, 1],
+        "west": [0, -1]
+    };
+    const monster = this.monsters.get(id);
+    const currentRoom = monster ? this.rooms.get(monster.location) : undefined;
+    if (currentRoom) {
+        const shuffledDirections = directions.sort(() => Math.random() - 0.5);
+        for (const direction of shuffledDirections) {
+            const [dx, dy] = dirOffsets[direction];
+            const nx = Math.floor(currentRoom.id / MaxMudCol) + dx;
+            const ny = (currentRoom.id % MaxMudCol) + dy;
+            const newLocation = nx * MaxMudCol + ny;
+            if (currentRoom.exits.has(direction)) {
+              monster ? monster.location = newLocation : undefined;
+                break;
+            }
+        }
+    }
+  }
+  
   //Rooms
   generateRandomDescription(): string {
       const descriptions = [
@@ -122,6 +164,7 @@ class Game {
   // Game
   initializeGame() : void {
     this.rooms = this.createRoomsDFS(MaxMudRow,MaxMudCol);
+    this.startMonsterMovement();
   } 
 
   displayRoomsGraphically(playerid: string, numRows: number, numCols: number): string {
@@ -150,6 +193,12 @@ class Game {
             grid[x][y] = `${greencolor}■${defaultcolor}`; // Use filled square for the current player
         }
 
+        // Place the monster on the grid
+        for (const monster of this.monsters.values()) {
+            const mx = Math.floor(monster.location / numCols) * 2;
+            const my = (monster.location % numCols) * 2;
+            grid[mx][my] = `${redcolor}M${defaultcolor}`; // Use 'M' for the monster
+        }
 
         room.exits.forEach((connectedRoom, direction) => {
             const [dx, dy] = direction === 'north' ? [-1, 0] :
