@@ -106,7 +106,7 @@ class Game {
     }
     // Game
     initializeGame() {
-        this.rooms = this.createRoomsDFS(10, 10);
+        this.rooms = this.createRoomsDFS(constants_1.MaxMudRow, constants_1.MaxMudCol);
     }
     displayRoomsGraphically(playerid, numRows, numCols) {
         const grid = Array.from({ length: numRows * 2 - 1 }, () => Array(numCols * 2 - 1).fill(' '));

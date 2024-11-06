@@ -3,7 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import Game from './game';
 import Room from './room';
-import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor } from './constants'; // Import the constants
+import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor, MaxMudRow, MaxMudCol } from './constants'; // Import the constants
 
 const app = express();
 const server = http.createServer(app);
@@ -45,7 +45,7 @@ io.on('connection', async (socket) => {
             }
         }
     } else if (command === 'map') {
-      update = game.displayRoomsGraphically(socket.id, 10, 10);
+      update = game.displayRoomsGraphically(socket.id, MaxMudRow,MaxMudCol);
 
     } else if (command === 'disconnect') {
         // Disconnect player
@@ -80,6 +80,6 @@ server.listen(3000, () => {
     room.exits.forEach((value, key) => { exits += key + ">" + value.id.toString().padStart(2, '0') + " "; });
     console.log(`Room ${room.id.toString().padStart(2, '0')}: ${exits}`);
   });
-  console.log(game.displayRoomsGraphically('', 10, 10)); // Adjust numRows and numCols as needed
+  console.log(game.displayRoomsGraphically('', MaxMudRow, MaxMudCol)); // Adjust numRows and numCols as needed
 
 });

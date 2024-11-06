@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.whitecolor = exports.cyancolor = exports.magentacolor = exports.yellowcolor = exports.bluecolor = exports.greencolor = exports.redcolor = exports.defaultcolor = void 0;
+exports.MaxMudRow = exports.MaxMudCol = exports.whitecolor = exports.cyancolor = exports.magentacolor = exports.yellowcolor = exports.bluecolor = exports.greencolor = exports.redcolor = exports.defaultcolor = void 0;
 exports.defaultcolor = "\x1b[0m";
 exports.redcolor = "\x1b[31m";
 exports.greencolor = "\x1b[32m";
@@ -9,3 +9,5 @@ exports.yellowcolor = "\x1b[33m";
 exports.magentacolor = "\x1b[35m";
 exports.cyancolor = "\x1b[36m";
 exports.whitecolor = "\x1b[37m";
+exports.MaxMudCol = 20;
+exports.MaxMudRow = 10;

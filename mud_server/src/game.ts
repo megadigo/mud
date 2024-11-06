@@ -1,6 +1,6 @@
 import Room from './room';
 import Player from './player';
-import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor } from './constants'; // Import the constants
+import { defaultcolor, redcolor, greencolor, bluecolor, yellowcolor, magentacolor, cyancolor, whitecolor, MaxMudRow, MaxMudCol } from './constants'; // Import the constants
 
 class Game {
 
@@ -121,7 +121,7 @@ class Game {
   
   // Game
   initializeGame() : void {
-    this.rooms = this.createRoomsDFS(10,10);
+    this.rooms = this.createRoomsDFS(MaxMudRow,MaxMudCol);
   } 
 
   displayRoomsGraphically(playerid: string, numRows: number, numCols: number): string {

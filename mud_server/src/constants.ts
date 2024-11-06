@@ -6,3 +6,7 @@ export const yellowcolor = "\x1b[33m";
 export const magentacolor = "\x1b[35m";
 export const cyancolor = "\x1b[36m";
 export const whitecolor = "\x1b[37m";
+
+
+export const MaxMudCol = 20;
+export const MaxMudRow = 10;

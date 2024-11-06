@@ -6,6 +6,12 @@ class Player {
         this.id = "";
         this.name = name;
         this.location = 0;
+        this.hp = 100;
+        this.maxhp = 100;
+        this.level = 1;
+        this.exp = 0;
+        this.gold = 0;
+        this.stance = 0;
     }
     SetPlayerName(name) {
         this.name = name;
