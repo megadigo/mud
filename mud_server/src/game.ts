@@ -78,6 +78,7 @@ class Game {
             const ny = (currentRoom.id % MaxMudCol) + dy;
             const newLocation = nx * MaxMudCol + ny;
             if (currentRoom.exits.has(direction)) {
+                monster ? monster.location = newLocation : undefined;
                 break;
             }
         }
