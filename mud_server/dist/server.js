@@ -56,7 +56,7 @@ io.on('connection', (socket) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (command === 'map') {
             // #region Display map
-            update = game.displayRoomsGraphically(socket.id, 3);
+            update = game.displayMap(socket.id);
             // #endregion
         }
         else if (command === 'disconnect') {
@@ -89,5 +89,5 @@ server.listen(3000, () => {
         room.exits.forEach((value, key) => { exits += key + ">" + value.id.toString().padStart(2, '0') + " "; });
         console.log(`Room ${room.id.toString().padStart(2, '0')}: ${exits}`);
     });
-    console.log(game.displayRoomsGraphically('')); // Adjust numRows and numCols as needed
+    console.log(game.displayMap('')); // Adjust numRows and numCols as needed
 });

@@ -18,7 +18,7 @@ class Game {
         this.rooms = this.createRoomsDFS(constants_1.MaxMudRow, constants_1.MaxMudCol);
         this.startMonsterMovement();
     }
-    displayRoomsGraphically(playerid, aroundPlayer = 0) {
+    displayMap(playerid) {
         const grid = Array.from({ length: constants_1.MaxMudRow * 2 - 1 }, () => Array(constants_1.MaxMudCol * 2 - 1).fill(' '));
         let player = this.players.get(playerid);
         let playerX = player ? Math.floor((player === null || player === void 0 ? void 0 : player.location) / constants_1.MaxMudCol) * 2 : 0;
@@ -26,43 +26,37 @@ class Game {
         this.rooms.forEach(room => {
             const x = Math.floor(room.id / constants_1.MaxMudCol) * 2;
             const y = (room.id % constants_1.MaxMudCol) * 2;
-            if (aroundPlayer === 0 || ((Math.abs(playerX - x) < aroundPlayer) && (Math.abs(playerY - y) < aroundPlayer))) {
-                grid[x][y] = `${constants_1.defaultcolor}□${constants_1.defaultcolor}`; // Use empty square for rooms
-                // Place the current player on the grid
-                const currentPlayer = this.players.get(playerid);
-                if (currentPlayer) {
-                    const x = Math.floor(currentPlayer.location / constants_1.MaxMudCol) * 2;
-                    const y = (currentPlayer.location % constants_1.MaxMudCol) * 2;
-                    grid[x][y] = `${constants_1.greencolor}■${constants_1.defaultcolor}`; // Use filled square for the current player
-                }
-                room.exits.forEach((connectedRoom, direction) => {
-                    const [dx, dy] = direction === 'north' ? [-1, 0] :
-                        direction === 'south' ? [1, 0] :
-                            direction === 'east' ? [0, 1] :
-                                direction === 'west' ? [0, -1] : [0, 0];
-                    if (dx !== 0 || dy !== 0) {
-                        grid[x + dx][y + dy] = direction === 'north' || direction === 'south' ? '|' : '-';
-                    }
-                });
+            grid[x][y] = `${constants_1.defaultcolor}□${constants_1.defaultcolor}`;
+            // Place the current player on the grid
+            const currentPlayer = this.players.get(playerid);
+            if (currentPlayer) {
+                const x = Math.floor(currentPlayer.location / constants_1.MaxMudCol) * 2;
+                const y = (currentPlayer.location % constants_1.MaxMudCol) * 2;
+                grid[x][y] = `${constants_1.greencolor}■${constants_1.defaultcolor}`;
             }
+            room.exits.forEach((connectedRoom, direction) => {
+                const [dx, dy] = direction === 'north' ? [-1, 0] :
+                    direction === 'south' ? [1, 0] :
+                        direction === 'east' ? [0, 1] :
+                            direction === 'west' ? [0, -1] : [0, 0];
+                if (dx !== 0 || dy !== 0) {
+                    grid[x + dx][y + dy] = direction === 'north' || direction === 'south' ? '|' : '-';
+                }
+            });
         });
         // Place other players on the grid
         this.players.forEach((player, id) => {
-            const x = Math.floor(player.location / constants_1.MaxMudCol) * 2;
-            const y = (player.location % constants_1.MaxMudCol) * 2;
-            if (id !== playerid && (aroundPlayer === 0 || ((Math.abs(playerX - x) < aroundPlayer) && (Math.abs(playerY - y) < aroundPlayer)))) {
+            if (id !== playerid) {
                 const x = Math.floor(player.location / constants_1.MaxMudCol) * 2;
                 const y = (player.location % constants_1.MaxMudCol) * 2;
-                grid[x][y] = `${constants_1.bluecolor}■${constants_1.defaultcolor}`; // Use star for other players
+                grid[x][y] = `${constants_1.bluecolor}■${constants_1.defaultcolor}`;
             }
         });
         // Place the monster on the grid
         for (const monster of this.monsters.values()) {
             const x = Math.floor(monster.location / constants_1.MaxMudCol) * 2;
             const y = (monster.location % constants_1.MaxMudCol) * 2;
-            if (aroundPlayer === 0 || ((Math.abs(playerX - x) < aroundPlayer) && (Math.abs(playerY - y) < aroundPlayer))) {
-                grid[x][y] = `${constants_1.redcolor}▲${constants_1.defaultcolor}`; // Use 'M' for the monster
-            }
+            grid[x][y] = `${constants_1.redcolor}▲${constants_1.defaultcolor}`;
         }
         return (grid.map(row => row.join('')).join('\n'));
     }
